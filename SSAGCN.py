@@ -19,11 +19,6 @@ from scipy import sparse
 import pickle as pkl
 import community
 
-random.seed(826)
-np.random.seed(826)
-torch.manual_seed(826)
-torch.cuda.manual_seed(826)
-
 def modularity(adj: np.array, pred: np.array):
     """
     非重叠模块度
@@ -92,10 +87,10 @@ def calculate_entropy(k, pred_labels, feat):
 def parse_args():
     parser = argparse.ArgumentParser()
 
-    parser.add_argument("--dataset", type=str, default="cora")
+    parser.add_argument("--dataset", type=str, default="cora", help="dataset")
     parser.add_argument('--lr', type=float, default=0.001, help='learning rate')
     parser.add_argument('--epochs', type=int, default=500, help='the number of epochs')
-
+    parser.add_argument('--topk', type=int, default=10, help='top-k')
 
     return parser.parse_known_args()
 
@@ -248,7 +243,7 @@ if __name__ == "__main__":
     printConfig(args)
     graph, feat, label = load_data(args.dataset)
 
-    kgraph = knn_graph(feat, 20) # top-k number
+    kgraph = knn_graph(feat, args.topk) # top-k number
 
     model = Ays(graph, kgraph, feat, label)
     optimizer = torch.optim.Adam(model.parameters(), lr=args.lr)
